@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generative Art Web App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .container { max-width: 600px; margin: auto; }
+    #result img { max-width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Generative Art Web App</h1>
+    <form id="promptForm">
+      <input type="text" id="promptInput" placeholder="Enter your creative prompt" style="width: 100%; padding: 10px;">
+      <button type="submit" style="margin-top: 10px; padding: 10px;">Generate Art</button>
+    </form>
+    <div id="result" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    document.getElementById('promptForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const prompt = document.getElementById('promptInput').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<p>Generating image, please wait...</p>';
+
+      try {
+        const response = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt })
+        });
+        const data = await response.json();
+        if (data.image_url) {
+          resultDiv.innerHTML = `<img src="${data.image_url}" alt="Generated Art">`;
+        } else {
+          resultDiv.innerHTML = `<p>Error: ${data.error || 'Unknown error occurred'}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
